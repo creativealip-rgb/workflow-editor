@@ -1,0 +1,25 @@
+import { jsonb, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+
+export const projects = pgTable("projects", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  sourceType: varchar("source_type", { length: 20 }).notNull(),
+  sourceUrl: text("source_url"),
+  rawArticle: text("raw_article"),
+  extractedTitle: text("extracted_title"),
+  extractedBody: text("extracted_body"),
+  targetFormat: varchar("target_format", { length: 50 }).notNull(),
+  durationTarget: varchar("duration_target", { length: 50 }).notNull(),
+  tone: varchar("tone", { length: 50 }).notNull(),
+  scriptMode: varchar("script_mode", { length: 50 }).notNull(),
+  headlineOptionsJson: jsonb("headline_options_json"),
+  subheadlineOptionsJson: jsonb("subheadline_options_json"),
+  voScript: text("vo_script"),
+  visualPlanJson: jsonb("visual_plan_json"),
+  imagePromptPlanJson: jsonb("image_prompt_plan_json"),
+  markdownExport: text("markdown_export"),
+  status: varchar("status", { length: 50 }).notNull().default("draft"),
+  checklistJson: jsonb("checklist_json"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});

@@ -39,3 +39,12 @@ Recommended next steps:
 2. set environment variables
 3. connect GitHub repo
 4. deploy using included Dockerfile
+
+## Current implementation status
+- dashboard scaffold ready
+- new project page scaffold ready
+- project workspace scaffold ready
+- health route ready
+- mock projects API ready
+- article extraction route now uses Readability + JSDOM for real URL parsing
+- generate route is still structured placeholder and should be connected to a real AI provider next

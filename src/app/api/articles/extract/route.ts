@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { extractArticleFromUrl } from "@/lib/article-extractor";
 import { extractArticleSchema } from "@/lib/schemas";
 
 export async function POST(request: NextRequest) {
@@ -9,8 +10,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  return NextResponse.json({
-    title: `Extracted article from ${parsed.data.url}`,
-    body: "Article extraction placeholder. Next step: implement real parser/readability fetch flow.",
-  });
+  try {
+    const article = await extractArticleFromUrl(parsed.data.url);
+    return NextResponse.json(article);
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : "Unknown extraction error",
+      },
+      { status: 422 }
+    );
+  }
 }

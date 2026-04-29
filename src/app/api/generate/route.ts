@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getProjectById, updateProject } from "@/db/repositories/projects";
 import { generateStructuredOutput } from "@/lib/ai-client";
-import { getMockProject, saveMockProject } from "@/lib/mock-store";
 import { buildProjectMarkdown } from "@/lib/markdown";
 import { generateSchema } from "@/lib/schemas";
 
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const project = getMockProject(parsed.data.projectId);
+  const project = await getProjectById(parsed.data.projectId);
 
   if (!project) {
     return NextResponse.json({ error: "Project not found" }, { status: 404 });
@@ -21,14 +21,14 @@ export async function POST(request: NextRequest) {
   try {
     const output = await generateStructuredOutput({
       title: String(project.title || "Untitled Project"),
-      sourceUrl: (project.sourceUrl as string | null | undefined) || null,
-      extractedTitle: (project.extractedTitle as string | null | undefined) || null,
-      extractedBody: (project.extractedBody as string | null | undefined) || null,
-      rawArticle: (project.rawArticle as string | null | undefined) || null,
-      targetFormat: (project.targetFormat as string | null | undefined) || null,
-      durationTarget: (project.durationTarget as string | null | undefined) || null,
-      tone: (project.tone as string | null | undefined) || null,
-      scriptMode: (project.scriptMode as string | null | undefined) || null,
+      sourceUrl: project.sourceUrl || null,
+      extractedTitle: project.extractedTitle || null,
+      extractedBody: project.extractedBody || null,
+      rawArticle: project.rawArticle || null,
+      targetFormat: project.targetFormat || null,
+      durationTarget: project.durationTarget || null,
+      tone: project.tone || null,
+      scriptMode: project.scriptMode || null,
     });
 
     const markdownExport = buildProjectMarkdown({
@@ -38,8 +38,7 @@ export async function POST(request: NextRequest) {
       voScript: output.voScript,
     });
 
-    const updated = {
-      ...project,
+    const updated = await updateProject(project.id, {
       headlineOptionsJson: output.headlineOptions,
       subheadlineOptionsJson: output.subheadlineOptions,
       voScript: output.voScript,
@@ -47,10 +46,7 @@ export async function POST(request: NextRequest) {
       imagePromptPlanJson: output.imagePromptPlan,
       markdownExport,
       status: "generated",
-      updatedAt: new Date().toISOString(),
-    };
-
-    saveMockProject(updated as Record<string, unknown> & { id: string });
+    });
 
     return NextResponse.json({ item: updated });
   } catch (error) {

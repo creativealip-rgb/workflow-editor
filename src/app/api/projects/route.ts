@@ -1,11 +1,11 @@
-import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { createProject, listProjects } from "@/db/repositories/projects";
 import { demoChecklist } from "@/lib/demo-data";
-import { listMockProjects, saveMockProject } from "@/lib/mock-store";
 import { createProjectSchema } from "@/lib/schemas";
 
 export async function GET() {
-  return NextResponse.json({ items: listMockProjects() });
+  const items = await listProjects();
+  return NextResponse.json({ items });
 }
 
 export async function POST(request: NextRequest) {
@@ -16,9 +16,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const now = new Date().toISOString();
-  const item = {
-    id: randomUUID(),
+  const item = await createProject({
     title: parsed.data.title,
     sourceType: parsed.data.sourceType,
     sourceUrl: parsed.data.sourceUrl || null,
@@ -29,10 +27,7 @@ export async function POST(request: NextRequest) {
     scriptMode: parsed.data.scriptMode,
     status: "draft",
     checklistJson: demoChecklist,
-    createdAt: now,
-    updatedAt: now,
-  };
+  });
 
-  saveMockProject(item);
   return NextResponse.json({ item }, { status: 201 });
 }

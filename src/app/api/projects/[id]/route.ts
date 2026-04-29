@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getMockProject, saveMockProject } from "@/lib/mock-store";
+import { getProjectById, updateProject } from "@/db/repositories/projects";
 import { updateProjectSchema } from "@/lib/schemas";
 
 export async function GET(
@@ -7,7 +7,7 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
-  const project = getMockProject(id);
+  const project = await getProjectById(id);
 
   if (!project) {
     return NextResponse.json({ error: "Project not found" }, { status: 404 });
@@ -21,7 +21,7 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
-  const existing = getMockProject(id);
+  const existing = await getProjectById(id);
 
   if (!existing) {
     return NextResponse.json({ error: "Project not found" }, { status: 404 });
@@ -34,12 +34,6 @@ export async function PATCH(
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const updated = {
-    ...existing,
-    ...parsed.data,
-    updatedAt: new Date().toISOString(),
-  };
-
-  saveMockProject(updated as Record<string, unknown> & { id: string });
+  const updated = await updateProject(id, parsed.data);
   return NextResponse.json({ item: updated });
 }

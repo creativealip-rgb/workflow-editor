@@ -13,6 +13,7 @@ Internal web app untuk workflow editor: artikel → headline → subheadline →
 ```bash
 npm install
 cp .env.example .env
+npm run db:push
 npm run dev
 ```
 
@@ -38,15 +39,16 @@ Target deployment: Dokploy via GitHub.
 Recommended next steps:
 1. create Postgres service in Dokploy
 2. set environment variables
-3. connect GitHub repo
-4. deploy using included Dockerfile
+3. run schema push/migration against production DB
+4. connect GitHub repo
+5. deploy using included Dockerfile
 
 ## Current implementation status
 - dashboard scaffold ready
 - new project page scaffold ready
 - project workspace scaffold ready
 - health route ready
-- mock projects API ready
+- projects API now targets Postgres via Drizzle repository layer
 - article extraction route now uses Readability + JSDOM for real URL parsing
 - generate route now supports real AI structured generation through an OpenAI-compatible chat completions API
 - output is validated with Zod before saving

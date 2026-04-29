@@ -20,6 +20,7 @@ npm run dev
 - `DATABASE_URL`
 - `AI_API_KEY`
 - `AI_MODEL`
+- `AI_BASE_URL` (optional, defaults to OpenAI-compatible `/v1`)
 - `NEXT_PUBLIC_APP_URL`
 
 ## Planned routes
@@ -47,4 +48,5 @@ Recommended next steps:
 - health route ready
 - mock projects API ready
 - article extraction route now uses Readability + JSDOM for real URL parsing
-- generate route is still structured placeholder and should be connected to a real AI provider next
+- generate route now supports real AI structured generation through an OpenAI-compatible chat completions API
+- output is validated with Zod before saving

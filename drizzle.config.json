@@ -1,0 +1,6 @@
+{
+  "$schema": "https://unpkg.com/drizzle-kit@latest/schema.json",
+  "dialect": "postgresql",
+  "schema": "./src/db/schema.ts",
+  "out": "./drizzle"
+}
